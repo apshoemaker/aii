@@ -4,7 +4,7 @@
 import { captureCanvas } from './chat-screenshot.js';
 
 export function createChatConnection(chatUI, renderer) {
-  const uuid = crypto.randomUUID();
+  let uuid = crypto.randomUUID();
   let ws = null;
   let reconnectTimer = null;
 
@@ -79,6 +79,13 @@ export function createChatConnection(chatUI, renderer) {
         ws.send(JSON.stringify({ type: 'message', uuid, content: text }));
       } else {
         chatUI.addMessage('system', 'Not connected. Retrying...');
+      }
+    },
+    newThread() {
+      uuid = crypto.randomUUID();
+      // Re-init with the new UUID so the backend gets a fresh thread
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'init', uuid }));
       }
     },
   };

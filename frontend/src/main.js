@@ -82,6 +82,7 @@ refreshBtn.addEventListener('click', async () => {
 const chatUI = createChatPanel();
 const chatConn = createChatConnection(chatUI, renderer);
 chatUI.onSend((text) => chatConn.send(text));
+chatUI.onNewChat(() => chatConn.newThread());
 
 // Live telemetry
 const telemetry = createTelemetryPoller();

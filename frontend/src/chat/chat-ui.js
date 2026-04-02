@@ -18,7 +18,10 @@ export function createChatPanel() {
   panel.innerHTML = `
     <div class="chat-header">
       <span class="chat-title">Mission Assistant</span>
-      <span class="chat-status-dot" id="chat-status-dot"></span>
+      <div class="chat-header-actions">
+        <button class="chat-new-btn" id="chat-new" title="New chat">+</button>
+        <span class="chat-status-dot" id="chat-status-dot"></span>
+      </div>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="chat-tool-indicator" id="chat-tool-indicator" style="display:none">
@@ -39,11 +42,14 @@ export function createChatPanel() {
   const toolIndicator = panel.querySelector('#chat-tool-indicator');
   const toolText = panel.querySelector('#tool-indicator-text');
 
+  const newChatBtn = panel.querySelector('#chat-new');
+
   let expanded = false;
   let streaming = false;
   let currentStreamEl = null;
   let currentStreamText = '';
   let onSend = null;
+  let onNewChat = null;
 
   // Toggle expand/collapse
   toggle.addEventListener('click', () => {
@@ -81,9 +87,20 @@ export function createChatPanel() {
     }
   });
 
+  newChatBtn.addEventListener('click', () => {
+    messagesEl.innerHTML = '';
+    currentStreamEl = null;
+    currentStreamText = '';
+    streaming = false;
+    toolIndicator.style.display = 'none';
+    if (onNewChat) onNewChat();
+    inputEl.focus();
+  });
+
   // Public API
   const api = {
     onSend(fn) { onSend = fn; },
+    onNewChat(fn) { onNewChat = fn; },
 
     addMessage(role, content) {
       const div = document.createElement('div');
