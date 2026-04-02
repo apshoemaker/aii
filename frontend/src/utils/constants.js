@@ -20,7 +20,7 @@ export const EARTH_ROTATION_PERIOD = 86164.1;
 export const GCS_BUCKET = 'p-2-cen1';
 export const GCS_OBJECT = 'October/1/October_105_1.txt';
 export const GCS_BASE = 'https://storage.googleapis.com/storage/v1/b';
-export const TELEMETRY_POLL_MS = 2000;
+export const TELEMETRY_POLL_MS = 1000;
 
 // Telemetry parameter IDs
 export const PARAM = {

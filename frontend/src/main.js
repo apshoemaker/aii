@@ -103,10 +103,11 @@ function animate() {
   earth.update();
 
   // Position Moon from ephemeris
+  let moonIcrf = null;
   if (moonInterp) {
-    const moonPos = moonInterp.positionAt(now);
-    if (moonPos) {
-      const p = icrfToThree(moonPos.x, moonPos.y, moonPos.z);
+    moonIcrf = moonInterp.positionAt(now);
+    if (moonIcrf) {
+      const p = icrfToThree(moonIcrf.x, moonIcrf.y, moonIcrf.z);
       moon.mesh.position.copy(p);
     }
   }
@@ -117,17 +118,32 @@ function animate() {
     if (sunPos) sun.update(sunPos);
   }
 
-  // Position spacecraft from Horizons ephemeris
+  // Position spacecraft — prefer live telemetry when fresh, fall back to ephemeris
+  const telem = telemetry.latest();
   let craftPos = null;
-  if (artemisInterp) {
+
+  // Use live telemetry if signal is good and data is less than 5 seconds old
+  if (telem?.position && telem.age < 5000) {
+    // Telemetry gives us real position (converted from feet to km in parser)
+    craftPos = {
+      x: telem.position.x,
+      y: telem.position.y,
+      z: telem.position.z,
+      // Use telemetry velocity if available, otherwise interpolate from ephemeris
+      vx: telem.velocity?.x ?? null,
+      vy: telem.velocity?.y ?? null,
+      vz: telem.velocity?.z ?? null,
+    };
+    spacecraft.updateFromEphemeris(craftPos);
+  } else if (artemisInterp) {
+    // Fall back to Horizons ephemeris interpolation
     craftPos = artemisInterp.stateAt(now);
     if (craftPos) {
       spacecraft.updateFromEphemeris(craftPos);
     }
   }
 
-  const telem = telemetry.latest();
-  updateHUD(craftPos, telem, moon.mesh.position);
+  updateHUD(craftPos, telem, moonIcrf);
 
   // Update timeline once per second
   const nowMs = Date.now();

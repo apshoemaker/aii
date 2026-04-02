@@ -1,6 +1,4 @@
-import { icrfToThree } from '../utils/coordinates.js';
 import { formatMET, kmToMilesStr, kmsToMphStr } from '../utils/time.js';
-import { SCALE } from '../utils/constants.js';
 
 const metEl = document.getElementById('met-value');
 const earthDistEl = document.getElementById('earth-dist');
@@ -14,11 +12,11 @@ const LAUNCH_EPOCH = new Date('2026-04-01T22:35:12Z');
 
 /**
  * Update the HUD overlay.
- * @param {object|null} craftState - Ephemeris state {x,y,z,vx,vy,vz} in ICRF km, km/s
+ * @param {object|null} craftState - Position {x,y,z} and velocity {vx,vy,vz} in ICRF km, km/s
  * @param {object|null} telem - Live telemetry data (for status indicator)
- * @param {Vector3} moonThreePos - Moon position in Three.js coordinates
+ * @param {object|null} moonIcrf - Moon position {x,y,z} in ICRF km
  */
-export function updateHUD(craftState, telem, moonThreePos) {
+export function updateHUD(craftState, telem, moonIcrf) {
   // Telemetry signal status
   if (telem) {
     if (telem.age < 5000) {
@@ -40,20 +38,24 @@ export function updateHUD(craftState, telem, moonThreePos) {
   const metSeconds = (Date.now() - LAUNCH_EPOCH.getTime()) / 1000;
   metEl.textContent = formatMET(metSeconds);
 
-  // Distances and velocity from ephemeris
+  // Distances and velocity
   if (craftState) {
     const { x, y, z } = craftState;
+
+    // Distance to Earth (origin in ICRF)
     const distEarthKm = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
     earthDistEl.textContent = kmToMilesStr(distEarthKm);
 
-    if (moonThreePos) {
-      const craftThree = icrfToThree(x, y, z);
-      const distMoonUnits = craftThree.distanceTo(moonThreePos);
-      const distMoonKm = distMoonUnits / SCALE;
+    // Distance to Moon (direct ICRF vector subtraction — no coordinate transform needed)
+    if (moonIcrf) {
+      const dx = x - moonIcrf.x;
+      const dy = y - moonIcrf.y;
+      const dz = z - moonIcrf.z;
+      const distMoonKm = Math.sqrt(dx ** 2 + dy ** 2 + dz ** 2);
       moonDistEl.textContent = kmToMilesStr(distMoonKm);
     }
 
-    // Velocity from ephemeris (km/s → mph)
+    // Velocity
     if (craftState.vx != null) {
       const speedKmS = Math.sqrt(craftState.vx ** 2 + craftState.vy ** 2 + craftState.vz ** 2);
       velocityEl.textContent = kmsToMphStr(speedKmS);

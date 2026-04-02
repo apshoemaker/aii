@@ -77,7 +77,7 @@ Three.js renderer, camera, OrbitControls, starfield, and lighting. Uses logarith
 
 ### `frontend/src/spacecraft/`
 
-`telemetry-poller.js` — Polls the NASA GCS bucket every 2 seconds. Two-step fetch: metadata (for cache-busting generation token) then content.
+`telemetry-poller.js` — Polls the NASA GCS bucket every 1 second. Two-step fetch: metadata (for generation token) then content. Tracks freshness by generation token — only fetches content when data actually changes, and reports true staleness (time since last new generation, not last poll).
 
 `telemetry-parser.js` — Extracts parameters from the JSON. Key discovery: positions are in **feet** (not meters). Converts to km with `× 0.0003048`.
 
@@ -114,7 +114,7 @@ FastAPI WebSocket server. Each connection gets its own screenshot queue and a fr
 
 ## Invariants
 
-- **Horizons is authoritative for position.** Telemetry position values (params 2003-2005) are supplementary — they're in feet, in an unverified reference frame, and show ~3-6% deviation from Horizons.
+- **Telemetry-first with Horizons fallback for position.** The spacecraft marker and HUD use live telemetry (params 2003-2005, in feet, converted to km) when the GCS data is fresh (< 5 seconds since last generation change). When telemetry goes stale, the system falls back to Horizons ephemeris interpolation. This prevents frozen-craft-with-moving-Moon bugs during telemetry gaps. The trajectory line always comes from Horizons.
 - **The system prompt is rebuilt every message.** It always contains the current MET and mission phase, preventing the agent from hallucinating stale state.
 - **Image tools use multimodal content blocks.** The `__IMAGE_TOOL_RESULT__` marker is intercepted by `make_image_aware_tool_node` and converted into proper `{"type": "image", "source": {"type": "base64", ...}}` blocks. Without this, Claude would hallucinate image contents.
 - **Ephemeris auto-refreshes every 30 minutes.** Both trajectory lines and milestone computations update when new data arrives. The manual refresh button triggers an immediate re-fetch.
