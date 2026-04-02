@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+websockets
+python-dotenv
+langchain-anthropic
+langgraph
+langchain-core
+httpx
+tavily-python
+yt-dlp
+pytest
+pytest-asyncio
