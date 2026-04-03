@@ -31,5 +31,6 @@
 ## Product & Operations
 
 - [docs/product-specs/index.md](docs/product-specs/index.md) — Feature specs
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — CI/CD pipeline, Cloud Run, GCP setup
 - [docs/RELIABILITY.md](docs/RELIABILITY.md) — Error handling, fallbacks, reconnection
 - [docs/SECURITY.md](docs/SECURITY.md) — API key management, eval safety

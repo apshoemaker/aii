@@ -24,3 +24,4 @@ Thumbs.db
 
 # Playwright
 .playwright-mcp/
+frontend/public/data/debug-artemis-response.txt

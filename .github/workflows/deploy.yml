@@ -1,0 +1,61 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  PROJECT_ID: grndctrl
+  REGION: us-central1
+  IMAGE: gcr.io/grndctrl/aii
+  SERVICE: aii
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Retag and push as latest
+        run: |
+          # Try to pull the image built during the PR
+          # If this is a direct push (no PR), build fresh
+          if docker pull $IMAGE:sha-${{ github.sha }} 2>/dev/null; then
+            echo "Retagging existing image from PR build"
+            docker tag $IMAGE:sha-${{ github.sha }} $IMAGE:latest
+          else
+            echo "No PR image found, building fresh"
+            docker build -t $IMAGE:latest -t $IMAGE:sha-${{ github.sha }} .
+            docker push $IMAGE:sha-${{ github.sha }}
+          fi
+          docker push $IMAGE:latest
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE }}
+          region: ${{ env.REGION }}
+          image: ${{ env.IMAGE }}:latest
+          flags: |
+            --allow-unauthenticated
+            --timeout=300
+            --memory=1Gi
+            --cpu=1
+            --min-instances=0
+            --max-instances=3
+            --set-secrets=ANTHROPIC_API_KEY=anthropic-key:latest,TAVILY_API_KEY=tavily-key:latest

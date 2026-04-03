@@ -1,0 +1,44 @@
+name: Build Container
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  PROJECT_ID: grndctrl
+  REGION: us-central1
+  IMAGE: gcr.io/grndctrl/aii
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and push container
+        run: |
+          docker build -t $IMAGE:pr-${{ github.event.pull_request.number }} \
+                       -t $IMAGE:sha-${{ github.sha }} \
+                       .
+          docker push $IMAGE:pr-${{ github.event.pull_request.number }}
+          docker push $IMAGE:sha-${{ github.sha }}
+
+      - name: Run backend tests
+        run: |
+          docker run --rm $IMAGE:sha-${{ github.sha }} \
+            python -m pytest tests/ -q

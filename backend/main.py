@@ -3,9 +3,13 @@ import asyncio
 import json
 import os
 import logging
+from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, Response
 from dotenv import load_dotenv
+import httpx
 
 from graph import build_graph
 from tools.screenshot import create_screenshot_tool
@@ -15,6 +19,40 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Artemis II Assistant")
+
+# Static frontend (production only — in dev, Vite serves these)
+STATIC_DIR = Path(__file__).parent / "static"
+
+
+# API proxies (replace Vite dev proxy in production)
+@app.get("/api/horizons")
+async def proxy_horizons(request: Request):
+    """Proxy JPL Horizons API to avoid CORS."""
+    async with httpx.AsyncClient(timeout=30) as client:
+        resp = await client.get(
+            "https://ssd.jpl.nasa.gov/api/horizons.api",
+            params=dict(request.query_params),
+        )
+        return Response(content=resp.content, media_type="text/plain")
+
+
+@app.get("/api/dsn")
+async def proxy_dsn():
+    """Proxy NASA DSN XML feed."""
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.get("https://eyes.nasa.gov/dsn/data/dsn.xml")
+        return Response(content=resp.content, media_type="application/xml")
+
+
+@app.get("/api/tdrs")
+async def proxy_tdrs():
+    """Proxy CelesTrak TDRS TLE data."""
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.get(
+            "https://celestrak.org/NORAD/elements/gp.php",
+            params={"GROUP": "tdrss", "FORMAT": "json"},
+        )
+        return Response(content=resp.content, media_type="application/json")
 
 
 async def invoke_agent(graph, message: str, thread_id: str, websocket: WebSocket):
@@ -132,3 +170,20 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.info(f"WebSocket disconnected: {thread_id}")
     except Exception as e:
         logger.error(f"WebSocket error: {e}")
+
+
+# Serve static frontend files in production
+# This must be AFTER all API/WebSocket routes
+if STATIC_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
+    app.mount("/data", StaticFiles(directory=STATIC_DIR / "data"), name="data")
+    app.mount("/textures", StaticFiles(directory=STATIC_DIR / "textures"), name="textures")
+    app.mount("/models", StaticFiles(directory=STATIC_DIR / "models"), name="models")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve static files, fallback to index.html for SPA."""
+        file_path = STATIC_DIR / full_path
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(STATIC_DIR / "index.html")

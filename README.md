@@ -136,6 +136,27 @@ npm run dev
 
 Open http://localhost:5199
 
+### Cloud Run (production)
+
+```bash
+# Build the combined production image
+docker build -t aii .
+
+# Test locally
+docker run -p 8080:8080 --env-file .env aii
+
+# Deploy to Cloud Run
+gcloud run deploy aii \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --set-secrets="ANTHROPIC_API_KEY=anthropic-key:latest,TAVILY_API_KEY=tavily-key:latest" \
+  --timeout=300 \
+  --memory=1Gi
+```
+
+The production image combines frontend (Vite build) + backend (FastAPI) into a single container. FastAPI serves the static files and proxies external APIs.
+
 ## Data Sources
 
 | Source | What it provides | How it's used |
