@@ -1,7 +1,7 @@
 """LangGraph agent definition for the Artemis II assistant."""
 from typing import Annotated, TypedDict
 
-from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import AnyMessage, SystemMessage, ToolMessage
 from langgraph.graph import START, StateGraph
 from langgraph.graph.message import add_messages
@@ -38,6 +38,7 @@ You have tools to:
 5. Check the mission timeline and current phase
 6. Capture and analyze a frame from the NASA YouTube live broadcast
 7. Calculate math expressions with orbital mechanics constants
+8. Query DSN and TDRS network status
 
 IMPORTANT RULES:
 - ALWAYS check the mission timeline context above before describing what phase the mission is in.
@@ -50,25 +51,21 @@ IMPORTANT RULES:
 
 IMAGE_TOOL_MARKER = "__IMAGE_TOOL_RESULT__"
 
+# Default model — near-free on OpenRouter ($0.10/M tokens), reliable tool use + vision
+DEFAULT_MODEL = "google/gemini-2.0-flash-001"
+
 
 class AgentState(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 
 def make_image_aware_tool_node(all_tools):
-    """Create a tool node that converts image tool results into multimodal ToolMessages.
-
-    When a tool returns a result starting with __IMAGE_TOOL_RESULT__, this node
-    constructs a ToolMessage with proper image content blocks so Claude can
-    actually see the image via its vision capabilities.
-    """
+    """Create a tool node that converts image tool results into multimodal ToolMessages."""
     base_node = ToolNode(all_tools)
 
     async def image_aware_tools(state: AgentState):
-        # Run the standard tool node
         result = await base_node.ainvoke(state)
 
-        # Post-process: convert image markers into multimodal content blocks
         new_messages = []
         for msg in result.get("messages", []):
             if isinstance(msg, ToolMessage) and isinstance(msg.content, str) and msg.content.startswith(IMAGE_TOOL_MARKER):
@@ -77,14 +74,11 @@ def make_image_aware_tool_node(all_tools):
                 b64_data = lines[2] if len(lines) > 2 else ""
 
                 if b64_data:
-                    # Construct multimodal content blocks for Claude vision
                     multimodal_content = [
                         {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": "image/jpeg",
-                                "data": b64_data,
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{b64_data}",
                             },
                         },
                         {
@@ -113,10 +107,18 @@ def build_graph(extra_tools=None):
     from dotenv import load_dotenv
     load_dotenv()
 
-    model = ChatAnthropic(
-        model="claude-sonnet-4-20250514",
-        api_key=os.getenv("ANTHROPIC_API_KEY"),
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    model_name = os.getenv("OPENROUTER_MODEL", DEFAULT_MODEL)
+
+    model = ChatOpenAI(
+        model=model_name,
+        api_key=api_key,
+        base_url="https://openrouter.ai/api/v1",
         max_tokens=4096,
+        default_headers={
+            "HTTP-Referer": "https://github.com/apshoemaker/aii",
+            "X-Title": "aii - Artemis II Tracker",
+        },
     )
 
     all_tools = [horizons_query, read_telemetry, inspect_telemetry, web_search, mission_timeline, calculate, analyze_live_feed, dsn_status, tdrs_status]

@@ -2,9 +2,12 @@ fastapi
 uvicorn[standard]
 websockets
 python-dotenv
-langchain-anthropic
-langgraph
-langchain-core
+langchain-openai==1.1.12
+langgraph==1.1.4
+langgraph-checkpoint==4.0.1
+langgraph-prebuilt==1.0.8
+langgraph-sdk==0.3.12
+langchain-core==1.2.25
 httpx
 tavily-python
 yt-dlp
