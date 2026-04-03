@@ -226,9 +226,8 @@ canvas#scene {
 #pb-slider-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
   flex: 1;
-  min-width: 160px;
+  min-width: 80px;
 }
 
 #pb-slider {
@@ -285,27 +284,25 @@ canvas#scene {
   color: #ccc;
   font-size: 11px;
   white-space: nowrap;
-  min-width: 90px;
+  flex-shrink: 0;
 }
 
 #pb-speed {
-  display: flex;
-  gap: 2px;
-}
-
-.pb-speed-btn {
-  background: none;
-  border: 1px solid transparent;
-  color: #555;
-  font-family: 'Courier New', monospace;
-  font-size: 10px;
-  padding: 3px 5px;
+  background: #222;
+  color: #4fc3f7;
+  border: 1px solid #4fc3f7;
   border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  padding: 3px 4px;
   cursor: pointer;
+  outline: none;
 }
 
-.pb-speed-btn:hover { color: #ccc; }
-.pb-speed-btn.active { color: #4fc3f7; border-color: #4fc3f7; }
+#pb-speed option {
+  background: #222;
+  color: #ccc;
+}
 
 /* Live Feeds — top center */
 #live-feeds {
@@ -1010,7 +1007,9 @@ canvas#scene {
 
   .pb-btn { min-width: 44px; min-height: 44px; font-size: 12px; }
   #pb-play-pause { font-size: 16px; }
-  .pb-speed-btn { min-width: 32px; min-height: 44px; font-size: 11px; }
+  #pb-speed { min-height: 44px; font-size: 12px; }
+
+  #pb-time-label { min-width: auto; font-size: 10px; }
 
   #pb-slider::-webkit-slider-thumb { width: 20px; height: 20px; }
   #pb-slider::-moz-range-thumb { width: 20px; height: 20px; }

@@ -5,7 +5,7 @@
 import missionClock, { EPHEMERIS_START, EPHEMERIS_END, LAUNCH_EPOCH } from '../utils/mission-clock.js';
 import { formatMET } from '../utils/time.js';
 
-let slider, timeLabel, playPauseBtn, liveBtn, speedBtns;
+let slider, timeLabel, playPauseBtn, liveBtn, speedSelect;
 let wasPausedBeforeDrag = false;
 let dragging = false;
 
@@ -25,10 +25,8 @@ function syncUI() {
   playPauseBtn.textContent = (isLive || !isPaused) ? '\u23F8' : '\u25B6';
   playPauseBtn.title = (isLive || !isPaused) ? 'Pause' : 'Play';
 
-  // Speed buttons
-  speedBtns.forEach(btn => {
-    btn.classList.toggle('active', parseInt(btn.dataset.rate) === rate);
-  });
+  // Speed dropdown
+  if (speedSelect) speedSelect.value = String(rate);
 }
 
 export function initPlaybackBar() {
@@ -36,7 +34,7 @@ export function initPlaybackBar() {
   timeLabel = document.getElementById('pb-time-label');
   playPauseBtn = document.getElementById('pb-play-pause');
   liveBtn = document.getElementById('pb-live');
-  speedBtns = document.querySelectorAll('.pb-speed-btn');
+  speedSelect = document.getElementById('pb-speed');
 
   if (!slider) return;
 
@@ -83,11 +81,9 @@ export function initPlaybackBar() {
     missionClock.goLive();
   });
 
-  // Speed buttons
-  speedBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      missionClock.setRate(parseInt(btn.dataset.rate));
-    });
+  // Speed dropdown
+  speedSelect.addEventListener('change', () => {
+    missionClock.setRate(parseInt(speedSelect.value));
   });
 
   // React to clock state changes
