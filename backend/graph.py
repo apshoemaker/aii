@@ -51,8 +51,8 @@ IMPORTANT RULES:
 
 IMAGE_TOOL_MARKER = "__IMAGE_TOOL_RESULT__"
 
-# Default model — near-free on OpenRouter ($0.10/M tokens), reliable tool use + vision
-DEFAULT_MODEL = "google/gemini-2.0-flash-001"
+# Default model — $1/$5 per M tokens on OpenRouter, reliable tool use
+DEFAULT_MODEL = "anthropic/claude-haiku-4.5"
 
 
 class AgentState(TypedDict):
