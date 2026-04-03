@@ -568,20 +568,54 @@ canvas#scene {
   background: rgba(79, 195, 247, 0.3);
 }
 
+/* Mobile top tabs — hidden on desktop */
+#mobile-tabs {
+  display: none;
+}
+
 /* ============================================
    MOBILE RESPONSIVE (< 768px)
    ============================================ */
 @media (max-width: 768px) {
   body {
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: auto;
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* Scene — top portion, relative flow */
+  /* Mobile tab bar at top */
+  #mobile-tabs {
+    display: flex;
+    background: rgba(18, 18, 22, 0.95);
+    border-bottom: 1px solid #333;
+    flex-shrink: 0;
+    z-index: 30;
+  }
+
+  .mobile-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #666;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .mobile-tab:hover { color: #aaa; }
+  .mobile-tab.active { color: #4fc3f7; border-bottom-color: #4fc3f7; }
+
+  /* Scene — fills remaining space below tabs */
   #scene-wrapper {
     width: 100vw;
-    height: 40vh;
+    flex: 1;
+    height: auto;
   }
 
   /* HUD — overlay on the scene */
@@ -593,18 +627,18 @@ canvas#scene {
   }
 
   #hud-title {
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: 4px;
     letter-spacing: 2px;
   }
 
   #hud > div {
-    font-size: 10px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.5;
   }
 
   #hud .label {
-    width: 55px;
+    width: 60px;
     font-size: 9px;
   }
 
@@ -613,47 +647,51 @@ canvas#scene {
   /* Timeline — hidden on mobile */
   #timeline { display: none; }
 
-  /* Feeds — full width, in flow */
+  /* Feeds — full screen when active */
   #live-feeds {
     position: relative;
     top: auto;
     left: auto;
     transform: none;
     width: 100%;
+    flex: 1;
     border-radius: 0;
     border: none;
-    border-top: 1px solid #333;
+    display: none;
   }
 
-  .feed-cell iframe { height: 90px; }
+  .feed-row {
+    flex: 1;
+    flex-direction: column;
+  }
 
-  /* Sidebar — in flow below feeds, fills remaining space */
+  .feed-cell { flex: 1; }
+
+  .feed-cell iframe {
+    height: 100%;
+    min-height: 150px;
+  }
+
+  /* Sidebar — full screen when active, hide internal tabs */
   #sidebar {
     position: relative;
     top: auto;
     right: auto;
     bottom: auto;
     width: 100%;
-    min-height: 50vh;
+    flex: 1;
     border-radius: 0;
     border: none;
-    border-top: 1px solid #333;
+    display: none;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
   }
 
-  .sidebar-tab {
-    font-size: 12px;
-    padding: 10px 0;
-  }
+  .sidebar-tabs { display: none; }
 
-  /* DSN embed shorter on mobile */
-  .dsn-embed { min-height: 200px; }
-  .dsn-embed iframe { min-height: 200px; }
-
-  /* DSN stations stack vertically */
-  .dsn-stations {
-    flex-direction: column;
-    gap: 10px;
-  }
+  /* DSN */
+  .dsn-embed { flex: 1; min-height: 250px; }
+  .dsn-embed iframe { min-height: 250px; height: 100%; }
+  .dsn-stations { flex-direction: column; gap: 10px; }
 
   /* Refresh button — float on scene */
   #refresh-btn {
@@ -665,19 +703,11 @@ canvas#scene {
     z-index: 20;
   }
 
-  /* Chat — safe area padding for Safari bottom bar */
+  /* Chat fills the screen */
+  #sidebar-chat { height: 100%; }
+  .chat-messages { flex: 1; }
   .chat-input-row {
     padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 10px));
-  }
-
-  /* Extra bottom padding on the sidebar for Safari URL bar */
-  #sidebar {
-    padding-bottom: env(safe-area-inset-bottom, 20px);
-  }
-
-  /* Chat messages take available space */
-  .chat-messages {
-    min-height: 200px;
   }
 }
 
