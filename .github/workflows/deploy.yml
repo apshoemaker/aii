@@ -58,4 +58,3 @@ jobs:
             --cpu=1
             --min-instances=0
             --max-instances=3
-            --set-secrets=ANTHROPIC_API_KEY=anthropic-key:latest,TAVILY_API_KEY=tavily-key:latest
