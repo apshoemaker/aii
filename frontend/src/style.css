@@ -618,10 +618,10 @@ canvas#scene {
     height: auto;
   }
 
-  /* HUD — overlay on the scene */
+  /* HUD — overlay on the scene, below the tab bar */
   #hud {
     position: absolute;
-    top: 8px;
+    top: 44px;
     left: 8px;
     z-index: 10;
   }
