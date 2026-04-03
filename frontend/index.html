@@ -76,6 +76,9 @@
 
     <!-- Chat tab (populated by chat-ui.js) -->
     <div class="sidebar-panel" data-tab="chat" id="sidebar-chat">
+      <div class="chat-disclaimer">
+        AI responses may be inaccurate. Verify critical data against official NASA sources.
+      </div>
       <div class="chat-messages" id="chat-messages"></div>
       <div class="chat-tool-indicator" id="chat-tool-indicator" style="display:none">
         <span class="tool-spinner">⟳</span> <span id="tool-indicator-text">Using tool...</span>
@@ -84,6 +87,7 @@
         <textarea id="chat-input" placeholder="Ask about the mission..." autocomplete="off" rows="1"></textarea>
         <button id="chat-send">→</button>
       </div>
+      <div class="chat-model-badge" id="chat-model-badge"></div>
     </div>
   </div>
 

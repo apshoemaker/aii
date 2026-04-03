@@ -147,6 +147,14 @@ async def websocket_endpoint(websocket: WebSocket):
             if msg_type == "init":
                 thread_id = data.get("uuid", "default")
                 logger.info(f"Initialized session: {thread_id}")
+                # Send model info to client
+                import os
+                from graph import DEFAULT_MODEL
+                model_name = os.getenv("OPENROUTER_MODEL", DEFAULT_MODEL)
+                await websocket.send_text(json.dumps({
+                    "type": "config",
+                    "model": model_name,
+                }))
 
             elif msg_type == "message":
                 thread_id = data.get("uuid", thread_id or "default")

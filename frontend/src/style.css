@@ -417,6 +417,26 @@ canvas#scene {
   font-size: 13px;
 }
 
+.chat-disclaimer {
+  padding: 6px 14px;
+  font-size: 9px;
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.08);
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.chat-model-badge {
+  padding: 4px 14px;
+  font-size: 9px;
+  color: #555;
+  text-align: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;

@@ -30,6 +30,11 @@ export function createChatConnection(chatUI, renderer) {
       }
 
       switch (data.type) {
+        case 'config':
+          const badge = document.getElementById('chat-model-badge');
+          if (badge) badge.textContent = data.model;
+          break;
+
         case 'token':
           chatUI.appendToken(data.content);
           break;
