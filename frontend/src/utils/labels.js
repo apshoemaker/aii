@@ -3,19 +3,34 @@ import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer
 let labelRenderer = null;
 
 /**
- * Initialize the CSS2D label renderer. Call once, passing the canvas container.
+ * Initialize the CSS2D label renderer.
+ * Appends the overlay as a sibling of the canvas inside a shared wrapper.
  */
 export function initLabelRenderer(camera, domElement) {
   labelRenderer = new CSS2DRenderer();
-  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+
+  const canvas = domElement;
+
+  // Create a wrapper around the canvas so the label overlay is positioned relative to it
+  const wrapper = document.createElement('div');
+  wrapper.id = 'scene-wrapper';
+  wrapper.style.position = 'relative';
+  wrapper.style.width = canvas.style.width || '100%';
+  wrapper.style.height = canvas.style.height || '100%';
+  canvas.parentNode.insertBefore(wrapper, canvas);
+  wrapper.appendChild(canvas);
+
+  labelRenderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
   labelRenderer.domElement.style.position = 'absolute';
   labelRenderer.domElement.style.top = '0';
   labelRenderer.domElement.style.left = '0';
   labelRenderer.domElement.style.pointerEvents = 'none';
-  document.body.appendChild(labelRenderer.domElement);
+  wrapper.appendChild(labelRenderer.domElement);
 
   window.addEventListener('resize', () => {
-    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    const w = canvas.offsetWidth;
+    const h = canvas.offsetHeight;
+    labelRenderer.setSize(w, h);
   });
 
   return labelRenderer;

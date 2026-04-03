@@ -11,10 +11,17 @@ body {
   color: #fff;
 }
 
-canvas#scene {
-  display: block;
+#scene-wrapper {
   width: 100vw;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+canvas#scene {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 #hud {
@@ -572,10 +579,9 @@ canvas#scene {
   }
 
   /* Scene — top portion, relative flow */
-  canvas#scene {
-    width: 100vw !important;
-    height: 40vh !important;
-    position: relative;
+  #scene-wrapper {
+    width: 100vw;
+    height: 40vh;
   }
 
   /* HUD — overlay on the scene */

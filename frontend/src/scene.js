@@ -52,12 +52,18 @@ export function createScene(canvas) {
   const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.8, sizeAttenuation: true });
   scene.add(new THREE.Points(starGeo, starMat));
 
-  // Handle resize
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+  // Handle resize — use canvas parent (wrapper) size, not window
+  function onResize() {
+    const wrapper = canvas.parentElement;
+    const w = wrapper ? wrapper.offsetWidth : window.innerWidth;
+    const h = wrapper ? wrapper.offsetHeight : window.innerHeight;
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+    renderer.setSize(w, h);
+  }
+  window.addEventListener('resize', onResize);
+  // Delay initial resize to catch mobile layout
+  setTimeout(onResize, 100);
 
   return { renderer, scene, camera, controls, sunLight };
 }
