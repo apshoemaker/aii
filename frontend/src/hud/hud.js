@@ -16,10 +16,15 @@ const LAUNCH_EPOCH = new Date('2026-04-01T22:35:12Z');
  * @param {object|null} craftState - Position {x,y,z} and velocity {vx,vy,vz} in ICRF km, km/s
  * @param {object|null} telem - Live telemetry data (for status indicator)
  * @param {object|null} moonIcrf - Moon position {x,y,z} in ICRF km
+ * @param {number} nowMs - Current simulation time in ms
+ * @param {boolean} isLive - Whether the clock is in live mode
  */
-export function updateHUD(craftState, telem, moonIcrf) {
+export function updateHUD(craftState, telem, moonIcrf, nowMs = Date.now(), isLive = true) {
   // Telemetry signal status
-  if (telem) {
+  if (!isLive) {
+    statusDot.className = 'playback';
+    statusText.textContent = 'Ephemeris playback';
+  } else if (telem) {
     if (telem.age < 5000) {
       statusDot.className = 'live';
       statusText.textContent = `Live — ${telem.activity}`;
@@ -35,8 +40,8 @@ export function updateHUD(craftState, telem, moonIcrf) {
     statusText.textContent = 'Connecting...';
   }
 
-  // MET from wall clock
-  const metSeconds = (Date.now() - LAUNCH_EPOCH.getTime()) / 1000;
+  // MET from virtual clock
+  const metSeconds = (nowMs - LAUNCH_EPOCH.getTime()) / 1000;
   metEl.textContent = formatMET(metSeconds);
 
   // Distances and velocity

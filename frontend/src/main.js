@@ -13,6 +13,8 @@ import { icrfToThree } from './utils/coordinates.js';
 import { initLabelRenderer } from './utils/labels.js';
 import { createChatPanel } from './chat/chat-ui.js';
 import { createChatConnection } from './chat/chat-ws.js';
+import missionClock from './utils/mission-clock.js';
+import { initPlaybackBar, updatePlaybackBar } from './hud/playback-bar.js';
 
 const canvas = document.getElementById('scene');
 const { renderer, scene, camera, controls, sunLight } = createScene(canvas);
@@ -90,17 +92,16 @@ const spacecraft = createSpacecraftMarker();
 scene.add(spacecraft.group);
 
 // Animation loop
-const clock = { start: Date.now() };
 let lastTimelineUpdate = 0;
 
 function animate() {
   requestAnimationFrame(animate);
+  missionClock.tick();
 
-  const now = new Date();
-  const dt = (Date.now() - clock.start) / 1000;
+  const now = missionClock.now();
 
-  // Rotate Earth (uses real GMST)
-  earth.update();
+  // Rotate Earth
+  earth.update(now);
 
   // Position Moon from ephemeris
   let moonIcrf = null;
@@ -118,12 +119,12 @@ function animate() {
     if (sunPos) sun.update(sunPos);
   }
 
-  // Position spacecraft — prefer live telemetry when fresh, fall back to ephemeris
+  // Position spacecraft — prefer live telemetry when fresh (live mode only), fall back to ephemeris
   const telem = telemetry.latest();
   let craftPos = null;
 
-  // Use live telemetry if signal is good and data is less than 5 seconds old
-  if (telem?.position && telem.age < 5000) {
+  // Use live telemetry only in live mode
+  if (missionClock.isLive() && telem?.position && telem.age < 5000) {
     // Telemetry gives us real position (converted from feet to km in parser)
     craftPos = {
       x: telem.position.x,
@@ -143,19 +144,22 @@ function animate() {
     }
   }
 
-  updateHUD(craftPos, telem, moonIcrf);
+  updateHUD(craftPos, telem, moonIcrf, missionClock.nowMs(), missionClock.isLive());
 
   // Update timeline once per second
-  const nowMs = Date.now();
+  const nowMs = missionClock.nowMs();
   if (nowMs - lastTimelineUpdate > 1000) {
     const metSeconds = (nowMs - LAUNCH_EPOCH.getTime()) / 1000;
     renderTimeline(timelineEl, metSeconds);
     lastTimelineUpdate = nowMs;
   }
 
+  updatePlaybackBar();
+
   controls.update();
   renderer.render(scene, camera);
   labelRenderer.render(scene, camera);
 }
 
+initPlaybackBar();
 animate();

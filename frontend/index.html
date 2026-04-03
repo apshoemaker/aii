@@ -138,6 +138,22 @@
     </div>
   </div>
 
+  <!-- Playback bar — time scrubber with play/pause/speed controls -->
+  <div id="playback-bar">
+    <button id="pb-live" class="pb-btn active" title="Go Live">LIVE</button>
+    <button id="pb-play-pause" class="pb-btn" title="Pause">⏸</button>
+    <div id="pb-slider-wrap">
+      <input type="range" id="pb-slider" min="0" max="1" step="0.0001" value="1" />
+      <div id="pb-time-label">—</div>
+    </div>
+    <div id="pb-speed">
+      <button class="pb-speed-btn active" data-rate="1">1x</button>
+      <button class="pb-speed-btn" data-rate="100">100x</button>
+      <button class="pb-speed-btn" data-rate="1000">1000x</button>
+      <button class="pb-speed-btn" data-rate="10000">10000x</button>
+    </div>
+  </div>
+
   <button id="refresh-btn" title="Refresh ephemeris from Horizons"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg></button>
 
   <script>
@@ -153,6 +169,7 @@
         const feeds = document.getElementById('live-feeds');
         const sidebar = document.getElementById('sidebar');
         const refreshBtn = document.getElementById('refresh-btn');
+        const playbackBar = document.getElementById('playback-bar');
 
         // Hide everything first
         if (sceneWrapper) sceneWrapper.style.display = 'none';
@@ -160,6 +177,7 @@
         if (feeds) feeds.style.display = 'none';
         if (sidebar) sidebar.style.display = 'none';
         if (refreshBtn) refreshBtn.style.display = 'none';
+        if (playbackBar) playbackBar.style.display = 'none';
 
         const aboutPanel = document.getElementById('about-panel');
         if (aboutPanel) aboutPanel.style.display = 'none';
@@ -170,6 +188,7 @@
           if (sceneWrapper) sceneWrapper.style.display = 'block';
           if (hud) hud.style.display = 'block';
           if (refreshBtn) refreshBtn.style.display = 'flex';
+          if (playbackBar) playbackBar.style.display = 'flex';
           window.dispatchEvent(new Event('resize'));
         } else if (id === 'media') {
           if (feeds) feeds.style.display = 'flex';

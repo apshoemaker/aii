@@ -47,14 +47,36 @@ Scale: 1 Three.js unit = 1,000 km. Applied in `icrfToThree()`.
 └─────────────────────────────────────────────┘
 ```
 
+## Mission Clock & Playback Bar
+
+The viewer supports time scrubbing via a virtual clock (`utils/mission-clock.js`) that decouples simulation time from wall time.
+
+**Modes:**
+- **Live** — `now()` returns real wall-clock time; live telemetry overrides ephemeris
+- **Playback** — `now()` returns virtual time, advanced by `tick()` at a configurable rate (1x/2x/4x/10x)
+
+**UI** (`hud/playback-bar.js`, positioned fixed bottom-center):
+- LIVE button (green glow when active) — returns to real-time
+- Play/Pause toggle
+- Range slider spanning the ephemeris window (Apr 2–10, 2026)
+- Speed buttons: 1x, 2x, 4x, 10x
+- MET time label
+
+**Key behaviors:**
+- Dragging the slider auto-pauses, resumes on release
+- Auto-pauses at ephemeris boundaries
+- Rate > 1 auto-enters playback mode; returning to 1x near real time auto-restores live mode
+- HUD status dot shows cyan "Ephemeris playback" when not live
+
 ## Animation Loop
 
 Runs at requestAnimationFrame (~60fps):
 
-1. `earth.update()` — compute GMST, set rotation
-2. Interpolate Moon, Sun positions from ephemeris at `Date.now()`
-3. Interpolate Artemis state (position + velocity) from ephemeris
-4. Update spacecraft marker position and orientation (velocity-aligned)
-5. `updateHUD()` — distances, velocity, MET from ephemeris
+1. `missionClock.tick()` — advance virtual time if in playback mode
+2. `earth.update(now)` — compute GMST, set rotation
+3. Interpolate Moon, Sun positions from ephemeris at `missionClock.now()`
+4. Interpolate Artemis state — live telemetry (if live mode + fresh) or ephemeris
+5. `updateHUD()` — distances, velocity, MET from virtual clock
 6. `renderTimeline()` — every 1 second, recompute milestone status
-7. `renderer.render()` + `labelRenderer.render()`
+7. `updatePlaybackBar()` — sync slider position and time label
+8. `renderer.render()` + `labelRenderer.render()`

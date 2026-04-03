@@ -52,9 +52,9 @@ export function createEarth() {
   const label = createLabel('EARTH', { color: '#4fc3f7', fontSize: '11px', offsetY: EARTH_RADIUS + 2 });
   mesh.add(label);
 
-  function update() {
-    // Compute real rotation angle from GMST
-    const angle = gmst(new Date());
+  function update(date) {
+    // Compute rotation angle from GMST
+    const angle = gmst(date || new Date());
     mesh.rotation.y = angle;
   }
 
