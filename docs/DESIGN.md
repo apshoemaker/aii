@@ -53,13 +53,13 @@ The viewer supports time scrubbing via a virtual clock (`utils/mission-clock.js`
 
 **Modes:**
 - **Live** — `now()` returns real wall-clock time; live telemetry overrides ephemeris
-- **Playback** — `now()` returns virtual time, advanced by `tick()` at a configurable rate (1x/2x/4x/10x)
+- **Playback** — `now()` returns virtual time, advanced by `tick()` at a configurable rate (1x/100x/1000x/10000x)
 
 **UI** (`hud/playback-bar.js`, positioned fixed bottom-center):
 - LIVE button (green glow when active) — returns to real-time
 - Play/Pause toggle
 - Range slider spanning the ephemeris window (Apr 2–10, 2026)
-- Speed buttons: 1x, 2x, 4x, 10x
+- Speed dropdown: 1x, 100x, 1000x, 10000x
 - MET time label
 
 **Key behaviors:**
@@ -67,6 +67,17 @@ The viewer supports time scrubbing via a virtual clock (`utils/mission-clock.js`
 - Auto-pauses at ephemeris boundaries
 - Rate > 1 auto-enters playback mode; returning to 1x near real time auto-restores live mode
 - HUD status dot shows cyan "Ephemeris playback" when not live
+
+## Telemetry Panel
+
+Collapsible panel below the HUD (`hud/telemetry-panel.js`) that displays all raw telemetry parameters grouped by category.
+
+- Collapsed by default — "TELEMETRY ▼" button, same width as HUD
+- Expands to show ~78 parameters in 13 categories (position, velocity, attitude, angular rates, thermal, solar arrays, orbital geometry, direction vectors, propulsion, sensors, pointing, status codes, time)
+- Only shows parameters with `Good` status from the GCS feed
+- Re-renders at most once per second when expanded
+- Parameter labels mirror the backend `PARAM_LABELS` dictionary in `backend/tools/telemetry.py`
+- The frontend parser (`spacecraft/telemetry-parser.js`) now returns `allParams` — all Good-status parameters from the raw telemetry JSON
 
 ## Animation Loop
 
@@ -77,6 +88,7 @@ Runs at requestAnimationFrame (~60fps):
 3. Interpolate Moon, Sun positions from ephemeris at `missionClock.now()`
 4. Interpolate Artemis state — live telemetry (if live mode + fresh) or ephemeris
 5. `updateHUD()` — distances, velocity, MET from virtual clock
-6. `renderTimeline()` — every 1 second, recompute milestone status
-7. `updatePlaybackBar()` — sync slider position and time label
-8. `renderer.render()` + `labelRenderer.render()`
+6. `updateTelemetryPanel()` — update raw params if expanded
+7. `renderTimeline()` — every 1 second, recompute milestone status
+8. `updatePlaybackBar()` — sync slider position and time label
+9. `renderer.render()` + `labelRenderer.render()`

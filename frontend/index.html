@@ -48,6 +48,11 @@
     </div>
   </div>
 
+  <div id="telemetry-panel">
+    <button id="tp-toggle"><span>TELEMETRY</span><span id="tp-arrow">▼</span></button>
+    <div id="tp-content"></div>
+  </div>
+
   <div id="timeline"></div>
 
   <!-- YouTube feeds — top center (mobile: media tab) -->
@@ -170,6 +175,7 @@
         const sidebar = document.getElementById('sidebar');
         const refreshBtn = document.getElementById('refresh-btn');
         const playbackBar = document.getElementById('playback-bar');
+        const telemetryPanel = document.getElementById('telemetry-panel');
 
         // Hide everything first
         if (sceneWrapper) sceneWrapper.style.display = 'none';
@@ -178,6 +184,7 @@
         if (sidebar) sidebar.style.display = 'none';
         if (refreshBtn) refreshBtn.style.display = 'none';
         if (playbackBar) playbackBar.style.display = 'none';
+        if (telemetryPanel) telemetryPanel.style.display = 'none';
 
         const aboutPanel = document.getElementById('about-panel');
         if (aboutPanel) aboutPanel.style.display = 'none';
@@ -189,6 +196,7 @@
           if (hud) hud.style.display = 'block';
           if (refreshBtn) refreshBtn.style.display = 'flex';
           if (playbackBar) playbackBar.style.display = 'flex';
+          if (telemetryPanel) telemetryPanel.style.display = 'block';
           window.dispatchEvent(new Event('resize'));
         } else if (id === 'media') {
           if (feeds) feeds.style.display = 'flex';

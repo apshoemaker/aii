@@ -24,6 +24,17 @@ export function parseTelemetry(raw) {
 
   // Telemetry positions are in FEET; convert to km (1 ft = 0.0003048 km)
   const FT_TO_KM = 0.0003048;
+
+  // Collect all parameters with Good status
+  const allParams = {};
+  for (const key in raw) {
+    if (!key.startsWith('Parameter_')) continue;
+    const val = raw[key];
+    if (!val || val.Status !== 'Good') continue;
+    const pid = key.replace('Parameter_', '');
+    allParams[pid] = val.Value;
+  }
+
   return {
     position: hasPosition ? { x: posX * FT_TO_KM, y: posY * FT_TO_KM, z: posZ * FT_TO_KM } : null,
     velocity: hasVelocity ? { x: velX * FT_TO_KM, y: velY * FT_TO_KM, z: velZ * FT_TO_KM } : null,
@@ -31,5 +42,6 @@ export function parseTelemetry(raw) {
     met,
     activity: raw?.File?.Activity || 'UNK',
     date: raw?.File?.Date || null,
+    allParams,
   };
 }

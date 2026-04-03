@@ -15,6 +15,7 @@ import { createChatPanel } from './chat/chat-ui.js';
 import { createChatConnection } from './chat/chat-ws.js';
 import missionClock from './utils/mission-clock.js';
 import { initPlaybackBar, updatePlaybackBar } from './hud/playback-bar.js';
+import { initTelemetryPanel, updateTelemetryPanel } from './hud/telemetry-panel.js';
 
 const canvas = document.getElementById('scene');
 const { renderer, scene, camera, controls, sunLight } = createScene(canvas);
@@ -145,6 +146,7 @@ function animate() {
   }
 
   updateHUD(craftPos, telem, moonIcrf, missionClock.nowMs(), missionClock.isLive());
+  updateTelemetryPanel(telem);
 
   // Update timeline once per second
   const nowMs = missionClock.nowMs();
@@ -162,4 +164,5 @@ function animate() {
 }
 
 initPlaybackBar();
+initTelemetryPanel();
 animate();
