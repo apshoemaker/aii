@@ -493,6 +493,48 @@ canvas#scene {
 .chat-msg-assistant strong { color: #fff; }
 .chat-msg-assistant a { color: #4fc3f7; }
 
+.chat-msg-assistant p { margin: 4px 0; }
+.chat-msg-assistant p:first-child { margin-top: 0; }
+.chat-msg-assistant p:last-child { margin-bottom: 0; }
+
+.chat-msg-assistant ul, .chat-msg-assistant ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.chat-msg-assistant li { margin: 2px 0; }
+
+.chat-msg-assistant table {
+  border-collapse: collapse;
+  margin: 6px 0;
+  font-size: 12px;
+  width: 100%;
+}
+
+.chat-msg-assistant th, .chat-msg-assistant td {
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.chat-msg-assistant th {
+  background: rgba(255,255,255,0.08);
+  color: #4fc3f7;
+}
+
+.chat-msg-assistant blockquote {
+  border-left: 2px solid #4fc3f7;
+  margin: 4px 0;
+  padding: 2px 10px;
+  color: #aaa;
+}
+
+.chat-msg-assistant hr {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  margin: 8px 0;
+}
+
 .chat-msg-system {
   color: #ff9800;
   font-size: 11px;
