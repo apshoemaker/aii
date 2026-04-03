@@ -58,6 +58,15 @@
   <!-- YouTube feeds — top center (mobile: media tab) -->
   <div id="live-feeds" data-mobile-section="media">
     <div class="feed-row">
+      <div class="feed-cell" id="gallery-cell">
+        <div class="feed-label">Gallery <span id="gallery-controls"><button id="gallery-prev" class="gallery-btn">◀</button><span id="gallery-counter">—</span><button id="gallery-next" class="gallery-btn">▶</button></span></div>
+        <div id="gallery-img-wrap">
+          <a id="gallery-link" href="#" target="_blank" rel="noopener">
+            <img id="gallery-img" alt="" />
+          </a>
+          <div id="gallery-caption"></div>
+        </div>
+      </div>
       <div class="feed-cell">
         <div class="feed-label">NASA TV</div>
         <iframe src="https://www.youtube.com/embed/6RwfNBtepa4?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>

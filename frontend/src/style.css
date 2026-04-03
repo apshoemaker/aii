@@ -381,7 +381,7 @@ canvas#scene {
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  width: 560px;
+  width: 780px;
   border: 1px solid #333;
   border-radius: 6px;
   overflow: hidden;
@@ -465,6 +465,60 @@ canvas#scene {
   text-align: center;
   padding: 3px 0;
   background: rgba(18, 18, 22, 0.85);
+}
+
+/* NASA Gallery — inside feed row */
+#gallery-controls {
+  float: right;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.gallery-btn {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 8px;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.gallery-btn:hover { color: #4fc3f7; }
+
+#gallery-counter {
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  color: #555;
+}
+
+#gallery-img-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+#gallery-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+}
+
+#gallery-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 3px 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  color: #ccc;
+  background: rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .feed-cell iframe {
@@ -1089,6 +1143,7 @@ canvas#scene {
 /* Tablet tweaks (768-1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   #sidebar { width: 340px; }
-  #live-feeds { width: 440px; }
+  #live-feeds { width: 620px; }
   .feed-cell iframe { height: 130px; }
+  #gallery-img { height: 130px; }
 }

@@ -16,6 +16,7 @@ import { createChatConnection } from './chat/chat-ws.js';
 import missionClock from './utils/mission-clock.js';
 import { initPlaybackBar, updatePlaybackBar } from './hud/playback-bar.js';
 import { initTelemetryPanel, updateTelemetryPanel } from './hud/telemetry-panel.js';
+import { initGallery } from './hud/nasa-gallery.js';
 
 const canvas = document.getElementById('scene');
 const { renderer, scene, camera, controls, sunLight } = createScene(canvas);
@@ -165,4 +166,5 @@ function animate() {
 
 initPlaybackBar();
 initTelemetryPanel();
+initGallery();
 animate();
