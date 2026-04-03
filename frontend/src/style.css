@@ -659,9 +659,14 @@ canvas#scene {
     z-index: 20;
   }
 
-  /* Chat — safe area padding */
+  /* Chat — safe area padding for Safari bottom bar */
   .chat-input-row {
-    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 10px));
+  }
+
+  /* Extra bottom padding on the sidebar for Safari URL bar */
+  #sidebar {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
   }
 
   /* Chat messages take available space */
