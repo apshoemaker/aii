@@ -18,6 +18,16 @@ export default defineConfig({
         target: BACKEND_URL,
         ws: true,
       },
+      '/api/dsn': {
+        target: 'https://eyes.nasa.gov',
+        changeOrigin: true,
+        rewrite: () => '/dsn/data/dsn.xml',
+      },
+      '/api/tdrs': {
+        target: 'https://celestrak.org',
+        changeOrigin: true,
+        rewrite: () => '/NORAD/elements/gp.php?GROUP=tdrss&FORMAT=json',
+      },
     },
   },
 });

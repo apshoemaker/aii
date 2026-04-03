@@ -145,20 +145,25 @@ Open http://localhost:5199
 | **NASA Blue Marble** | Earth texture (5400x2700 equirectangular) | Earth sphere rendering |
 | **NASA LROC** | Moon texture (2048x1024 from Lunar Reconnaissance Orbiter) | Moon sphere rendering |
 | **NASA 3D Resources** | Orion capsule STL model | 3D spacecraft model with procedural service module |
+| **NASA DSN** | Real-time Deep Space Network status (XML feed) | Antenna tracking display, agent tool |
+| **CelesTrak** | TDRS satellite TLE orbital elements | TDRS constellation positions and coverage zones |
 
 ## AI Assistant Tools
 
-The chat assistant has 7 tools:
+The chat assistant has 10 tools:
 
 | Tool | Description |
 |------|-------------|
 | `horizons_query` | Query JPL Horizons API for position/velocity of any body at any time |
 | `read_telemetry` | Fetch summary of current live telemetry (position, velocity, MET) |
-| `inspect_telemetry` | Full dump of all ~78 telemetry parameters, grouped by category |
+| `inspect_telemetry` | Full dump of all telemetry parameters, grouped by category |
 | `mission_timeline` | Get computed milestones with real distances/speeds from ephemeris |
 | `web_search` | Search the web for Artemis II news and orbital mechanics info |
 | `analyze_screenshot` | Capture and analyze the current 3D view with Claude's vision |
+| `analyze_live_feed` | Capture and analyze a frame from the NASA YouTube live broadcast |
 | `calculate` | Evaluate math expressions with orbital mechanics constants |
+| `dsn_status` | Real-time Deep Space Network antenna tracking status |
+| `tdrs_status` | TDRS relay satellite constellation positions and coverage |
 
 ## Project Structure
 

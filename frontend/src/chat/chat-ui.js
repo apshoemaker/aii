@@ -1,69 +1,26 @@
 /**
- * Collapsible chat panel UI — pure DOM construction.
+ * Chat UI — attaches to the sidebar chat tab.
  */
 import { markdownToHtml } from './chat-markdown.js';
 
 export function createChatPanel() {
-  // Toggle button
-  const toggle = document.createElement('button');
-  toggle.id = 'chat-toggle';
-  toggle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="13" y2="13"/></svg>';
-  toggle.title = 'Mission Assistant';
-  document.body.appendChild(toggle);
+  // Elements are already in the HTML sidebar
+  const messagesEl = document.getElementById('chat-messages');
+  const inputEl = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('chat-send');
+  const toolIndicator = document.getElementById('chat-tool-indicator');
+  const toolText = document.getElementById('tool-indicator-text');
 
-  // Chat panel
-  const panel = document.createElement('div');
-  panel.id = 'chat-panel';
-  panel.classList.add('collapsed');
-  panel.innerHTML = `
-    <div class="chat-header">
-      <span class="chat-title">Mission Assistant</span>
-      <div class="chat-header-actions">
-        <button class="chat-new-btn" id="chat-new" title="New chat">+</button>
-        <span class="chat-status-dot" id="chat-status-dot"></span>
-      </div>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-tool-indicator" id="chat-tool-indicator" style="display:none">
-      <span class="tool-spinner">⟳</span> <span id="tool-indicator-text">Using tool...</span>
-    </div>
-    <div class="chat-input-row">
-      <textarea id="chat-input" placeholder="Ask about the mission..." autocomplete="off" rows="1"></textarea>
-      <button id="chat-send">→</button>
-    </div>
-  `;
-  document.body.appendChild(panel);
-
-  // Elements
-  const messagesEl = panel.querySelector('#chat-messages');
-  const inputEl = panel.querySelector('#chat-input');
-  const sendBtn = panel.querySelector('#chat-send');
-  const statusDot = panel.querySelector('#chat-status-dot');
-  const toolIndicator = panel.querySelector('#chat-tool-indicator');
-  const toolText = panel.querySelector('#tool-indicator-text');
-
-  const newChatBtn = panel.querySelector('#chat-new');
-
-  let expanded = false;
   let streaming = false;
   let currentStreamEl = null;
   let currentStreamText = '';
   let onSend = null;
   let onNewChat = null;
 
-  // Toggle expand/collapse
-  toggle.addEventListener('click', () => {
-    expanded = !expanded;
-    panel.classList.toggle('collapsed', !expanded);
-    panel.classList.toggle('expanded', expanded);
-    toggle.classList.toggle('active', expanded);
-    if (expanded) inputEl.focus();
-  });
-
   // Auto-resize textarea (up to 4 lines)
   function autoResizeInput() {
     inputEl.style.height = 'auto';
-    const lineHeight = 20; // matches CSS
+    const lineHeight = 20;
     const maxHeight = lineHeight * 4;
     inputEl.style.height = Math.min(inputEl.scrollHeight, maxHeight) + 'px';
   }
@@ -75,7 +32,7 @@ export function createChatPanel() {
     const text = inputEl.value.trim();
     if (!text || streaming) return;
     inputEl.value = '';
-    inputEl.style.height = 'auto'; // reset height after send
+    inputEl.style.height = 'auto';
     if (onSend) onSend(text);
   }
 
@@ -85,16 +42,6 @@ export function createChatPanel() {
       e.preventDefault();
       submitMessage();
     }
-  });
-
-  newChatBtn.addEventListener('click', () => {
-    messagesEl.innerHTML = '';
-    currentStreamEl = null;
-    currentStreamText = '';
-    streaming = false;
-    toolIndicator.style.display = 'none';
-    if (onNewChat) onNewChat();
-    inputEl.focus();
   });
 
   // Public API
@@ -146,6 +93,8 @@ export function createChatPanel() {
         analyze_screenshot: 'Analyzing screenshot...',
         analyze_live_feed: 'Capturing NASA live feed...',
         mission_timeline: 'Checking timeline...',
+        dsn_status: 'Querying Deep Space Network...',
+        tdrs_status: 'Querying TDRS constellation...',
         calculate: 'Calculating...',
       };
       toolText.textContent = labels[name] || `Using ${name}...`;
@@ -157,7 +106,11 @@ export function createChatPanel() {
     },
 
     setStatus(status) {
-      statusDot.className = `chat-status-dot ${status}`;
+      // Update the chat tab indicator
+      const chatTab = document.querySelector('.sidebar-tab[data-tab="chat"]');
+      if (chatTab) {
+        chatTab.classList.toggle('connected', status === 'connected');
+      }
     },
   };
 

@@ -8,7 +8,7 @@
 
 - [docs/DESIGN.md](docs/DESIGN.md) — Frontend design: Three.js scene, HUD, coordinate transforms
 - [docs/BACKEND.md](docs/BACKEND.md) — Backend design: LangGraph agent, tools, WebSocket protocol
-- [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) — JPL Horizons, GCS telemetry, NASA textures
+- [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) — JPL Horizons, GCS telemetry, DSN, TDRS, NASA textures
 
 ## Architecture Decision Records
 
@@ -19,6 +19,8 @@
 - [docs/ADRs/004-python-backend.md](docs/ADRs/004-python-backend.md)
 - [docs/ADRs/005-image-tool-multimodal.md](docs/ADRs/005-image-tool-multimodal.md)
 - [docs/ADRs/006-computed-milestones.md](docs/ADRs/006-computed-milestones.md)
+- [docs/ADRs/007-dsn-xml-structure.md](docs/ADRs/007-dsn-xml-structure.md)
+- [docs/ADRs/008-telemetry-blending.md](docs/ADRs/008-telemetry-blending.md)
 
 ## References
 

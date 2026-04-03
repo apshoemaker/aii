@@ -13,6 +13,8 @@ from tools.telemetry import read_telemetry, inspect_telemetry
 from tools.web_search import web_search
 from tools.calculator import calculate
 from tools.livefeed import analyze_live_feed
+from tools.dsn import dsn_status
+from tools.tdrs import tdrs_status
 from tools.timeline import mission_timeline, get_mission_context_string
 
 SYSTEM_PROMPT_TEMPLATE = """You are an AI assistant for the Artemis II mission trajectory viewer — a real-time 3D visualization of NASA's Artemis II crewed lunar flyby mission.
@@ -117,7 +119,7 @@ def build_graph(extra_tools=None):
         max_tokens=4096,
     )
 
-    all_tools = [horizons_query, read_telemetry, inspect_telemetry, web_search, mission_timeline, calculate, analyze_live_feed]
+    all_tools = [horizons_query, read_telemetry, inspect_telemetry, web_search, mission_timeline, calculate, analyze_live_feed, dsn_status, tdrs_status]
     if extra_tools:
         all_tools.extend(extra_tools)
 

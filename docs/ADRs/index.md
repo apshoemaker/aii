@@ -8,3 +8,5 @@
 | [004](004-python-backend.md) | Python/FastAPI backend over Node.js | Accepted | 2026-04-02 |
 | [005](005-image-tool-multimodal.md) | Multimodal ToolMessages for image analysis | Accepted | 2026-04-02 |
 | [006](006-computed-milestones.md) | Compute milestones from ephemeris, not hardcode | Accepted | 2026-04-02 |
+| [007](007-dsn-xml-structure.md) | DSN XML dishes are siblings, not children of stations | Accepted | 2026-04-02 |
+| [008](008-telemetry-blending.md) | Blend live telemetry with Horizons for position | Accepted | 2026-04-02 |

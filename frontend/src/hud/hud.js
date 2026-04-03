@@ -2,6 +2,7 @@ import { formatMET, kmToMilesStr, kmsToMphStr } from '../utils/time.js';
 
 const metEl = document.getElementById('met-value');
 const earthDistEl = document.getElementById('earth-dist');
+const earthAltEl = document.getElementById('earth-alt');
 const moonDistEl = document.getElementById('moon-dist');
 const velocityEl = document.getElementById('velocity-value');
 const statusDot = document.getElementById('status-dot');
@@ -42,9 +43,10 @@ export function updateHUD(craftState, telem, moonIcrf) {
   if (craftState) {
     const { x, y, z } = craftState;
 
-    // Distance to Earth (origin in ICRF)
+    // Distance from Earth center + altitude above surface
     const distEarthKm = Math.sqrt(x ** 2 + y ** 2 + z ** 2);
     earthDistEl.textContent = kmToMilesStr(distEarthKm);
+    earthAltEl.textContent = kmToMilesStr(distEarthKm - 6371);
 
     // Distance to Moon (direct ICRF vector subtraction — no coordinate transform needed)
     if (moonIcrf) {

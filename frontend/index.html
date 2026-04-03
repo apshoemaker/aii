@@ -13,6 +13,7 @@
     <div id="hud-title">ARTEMIS II</div>
     <div id="hud-met"><span class="label">MET</span> <span id="met-value">—</span></div>
     <div id="hud-earth"><span class="label">Earth</span> <span id="earth-dist">—</span></div>
+    <div id="hud-alt"><span class="label">Altitude</span> <span id="earth-alt">—</span></div>
     <div id="hud-moon"><span class="label">Moon</span> <span id="moon-dist">—</span></div>
     <div id="hud-velocity"><span class="label">Velocity</span> <span id="velocity-value">—</span></div>
     <div id="hud-status">
@@ -23,28 +24,203 @@
 
   <div id="timeline"></div>
 
-  <div id="live-feed">
-    <div class="feed-header">
-      <span class="feed-title">NASA LIVE</span>
-      <button id="feed-toggle" title="Toggle live feed">▽</button>
+  <!-- YouTube feeds — top center -->
+  <div id="live-feeds">
+    <div class="feed-row">
+      <div class="feed-cell">
+        <div class="feed-label">NASA TV</div>
+        <iframe src="https://www.youtube.com/embed/6RwfNBtepa4?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+      <div class="feed-cell">
+        <div class="feed-label">Tracker</div>
+        <iframe src="https://www.youtube.com/embed/m3kR2KK8TEs?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
     </div>
-    <div class="feed-embed" id="feed-embed">
-      <iframe src="https://www.youtube.com/embed/6RwfNBtepa4?autoplay=1&mute=1&modestbranding=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+
+  <!-- Right sidebar: DSN + Chat -->
+  <div id="sidebar">
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" data-tab="dsn">DSN</button>
+      <button class="sidebar-tab" data-tab="tdrs">TDRS</button>
+      <button class="sidebar-tab" data-tab="chat">Chat</button>
+    </div>
+
+    <!-- DSN tab -->
+    <div class="sidebar-panel active" data-tab="dsn">
+      <div class="dsn-stations" id="dsn-stations">Loading DSN data...</div>
+      <div class="dsn-embed">
+        <iframe src="https://eyes.nasa.gov/dsn/dsn.html" frameborder="0"></iframe>
+      </div>
+    </div>
+
+    <!-- TDRS / Space Network tab -->
+    <div class="sidebar-panel" data-tab="tdrs">
+      <div class="tdrs-header">
+        <div class="tdrs-title-row">SPACE NETWORK (TDRS)</div>
+        <div class="tdrs-subtitle">Tracking & Data Relay Satellites — Geostationary orbit</div>
+      </div>
+      <div class="tdrs-sats" id="tdrs-sats">Loading TDRS data...</div>
+      <div class="tdrs-info">
+        <div class="tdrs-note">
+          TDRS provides relay communications for spacecraft in low/medium Earth orbit.
+          Unlike DSN, no public real-time link status is available.
+          Positions shown are derived from NORAD TLE data via CelesTrak.
+        </div>
+        <div class="tdrs-note">
+          Active TDRS fleet: TDRS-3, 5, 6, 7, 8, 11, 12, 13
+          <br>Longitude positions span the Atlantic, Pacific, and Indian Ocean regions.
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat tab (populated by chat-ui.js) -->
+    <div class="sidebar-panel" data-tab="chat" id="sidebar-chat">
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-tool-indicator" id="chat-tool-indicator" style="display:none">
+        <span class="tool-spinner">⟳</span> <span id="tool-indicator-text">Using tool...</span>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="chat-input" placeholder="Ask about the mission..." autocomplete="off" rows="1"></textarea>
+        <button id="chat-send">→</button>
+      </div>
     </div>
   </div>
 
   <button id="refresh-btn" title="Refresh ephemeris from Horizons"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg></button>
-  <div id="chat-container"></div>
 
   <script>
-    document.getElementById('feed-toggle').addEventListener('click', () => {
-      document.getElementById('live-feed').classList.toggle('collapsed');
+    // Sidebar tab switching
+    document.querySelectorAll('.sidebar-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const id = tab.dataset.tab;
+        document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+        document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === id));
+      });
     });
-    document.querySelector('.feed-header').addEventListener('click', (e) => {
-      if (e.target.id !== 'feed-toggle') {
-        document.getElementById('live-feed').classList.toggle('collapsed');
+
+    // DSN XML polling
+    async function fetchDSN() {
+      try {
+        const res = await fetch('/api/dsn');
+        if (!res.ok) return;
+        const text = await res.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, 'text/xml');
+        const el = document.getElementById('dsn-stations');
+
+        const stations = xml.querySelectorAll('station');
+        let html = '';
+        stations.forEach(station => {
+          const name = station.getAttribute('friendlyName');
+          const dishes = station.querySelectorAll('dish');
+          let dishHtml = '';
+          dishes.forEach(dish => {
+            const dishName = dish.getAttribute('name');
+            const targets = dish.querySelectorAll('target');
+            const downSignals = dish.querySelectorAll('downSignal');
+
+            let targetNames = [];
+            targets.forEach(t => {
+              const tName = t.getAttribute('name');
+              if (tName) targetNames.push(tName);
+            });
+
+            let dataRate = '';
+            downSignals.forEach(sig => {
+              if (sig.getAttribute('active') === 'true') {
+                const rate = parseFloat(sig.getAttribute('dataRate'));
+                if (rate > 0) dataRate = rate > 1000000 ? (rate/1000000).toFixed(1) + ' Mb/s' : rate > 1000 ? (rate/1000).toFixed(1) + ' kb/s' : rate.toFixed(0) + ' b/s';
+              }
+            });
+
+            const isActive = targetNames.length > 0;
+            const cls = isActive ? 'dsn-dish active' : 'dsn-dish';
+            const targetStr = targetNames.join(', ') || '—';
+            const isArtemis = targetNames.some(n => { const l = n.toLowerCase(); return l === 'em2' || l === 'em-2' || l.includes('orion') || l.includes('artemis'); });
+
+            dishHtml += '<div class="' + cls + (isArtemis ? ' artemis' : '') + '">';
+            dishHtml += '<span class="dish-name">' + dishName + '</span> ';
+            dishHtml += '<span class="dish-target">' + targetStr + '</span>';
+            if (dataRate) dishHtml += ' <span class="dish-rate">' + dataRate + '</span>';
+            dishHtml += '</div>';
+          });
+
+          html += '<div class="dsn-station"><div class="station-name">' + name + '</div>' + dishHtml + '</div>';
+        });
+
+        el.innerHTML = html || 'No DSN data';
+      } catch (e) {
+        // silent fail
       }
-    });
+    }
+
+    fetchDSN();
+    setInterval(fetchDSN, 5000);
+
+    // TDRS satellite data from CelesTrak
+    async function fetchTDRS() {
+      try {
+        const res = await fetch('/api/tdrs');
+        if (!res.ok) return;
+        const sats = await res.json();
+        const el = document.getElementById('tdrs-sats');
+
+        // Filter to only TDRS satellites
+        const tdrs = sats.filter(s => s.OBJECT_NAME && s.OBJECT_NAME.startsWith('TDRS'));
+
+        // Compute approximate GEO longitude from right ascension of ascending node + mean anomaly
+        let html = '<table class="tdrs-table"><tr><th>Satellite</th><th>NORAD</th><th>Incl</th><th>Epoch</th><th>Status</th></tr>';
+
+        tdrs.forEach(sat => {
+          const name = sat.OBJECT_NAME;
+          const norad = sat.NORAD_CAT_ID;
+          const inc = parseFloat(sat.INCLINATION).toFixed(1);
+          const epoch = sat.EPOCH ? sat.EPOCH.substring(0, 10) : '?';
+          const meanMotion = parseFloat(sat.MEAN_MOTION);
+          const isGeo = meanMotion > 0.9 && meanMotion < 1.1;
+          const status = isGeo ? '<span class="tdrs-active">GEO</span>' : '<span class="tdrs-inactive">NON-GEO</span>';
+
+          // Approximate sub-satellite longitude from RAAN + argument of perigee + mean anomaly
+          const raan = parseFloat(sat.RA_OF_ASC_NODE || 0);
+          const argp = parseFloat(sat.ARG_OF_PERICENTER || 0);
+          const ma = parseFloat(sat.MEAN_ANOMALY || 0);
+          // For near-circular GEO, longitude ≈ RAAN + argp + MA - GMST
+          // This is a rough approximation
+          const epochDate = new Date(sat.EPOCH);
+          const jd = epochDate.getTime() / 86400000 + 2440587.5;
+          const T = (jd - 2451545.0) / 36525.0;
+          const gmstDeg = (280.46061837 + 360.98564736629 * (jd - 2451545.0)) % 360;
+          let lon = ((raan + argp + ma - gmstDeg) % 360 + 360) % 360;
+          if (lon > 180) lon -= 360;
+          const lonStr = isGeo ? lon.toFixed(1) + '°' : '—';
+
+          html += '<tr>';
+          html += '<td class="tdrs-name">' + name + '</td>';
+          html += '<td>' + norad + '</td>';
+          html += '<td>' + inc + '°</td>';
+          html += '<td>' + epoch + '</td>';
+          html += '<td>' + status + ' ' + lonStr + '</td>';
+          html += '</tr>';
+        });
+
+        html += '</table>';
+
+        // Coverage summary
+        const geoCount = tdrs.filter(s => {
+          const mm = parseFloat(s.MEAN_MOTION);
+          return mm > 0.9 && mm < 1.1;
+        }).length;
+        html += '<div class="tdrs-summary">' + geoCount + ' TDRS satellites in geostationary orbit providing near-global coverage</div>';
+
+        el.innerHTML = html;
+      } catch (e) {
+        // silent fail
+      }
+    }
+
+    fetchTDRS();
+    setInterval(fetchTDRS, 60000); // refresh every 60s (TLEs don't change fast)
   </script>
   <script type="module" src="/src/main.js"></script>
 </body>

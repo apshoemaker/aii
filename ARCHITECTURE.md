@@ -95,18 +95,20 @@ The system prompt is rebuilt every invocation with fresh mission state (current 
 
 ### `backend/tools/`
 
-Eight tools, each a `@tool`-decorated async function:
+Ten tools, each a `@tool`-decorated async function:
 
 | Tool | External dependency | What it does |
 |------|-------------------|-------------|
 | `horizons_query` | JPL Horizons API | Position/velocity vectors for any body at any time |
 | `read_telemetry` | NASA GCS bucket | Quick telemetry summary (position, velocity, MET) |
-| `inspect_telemetry` | NASA GCS bucket | Full dump of ~78 parameters with labels, by category |
+| `inspect_telemetry` | NASA GCS bucket | Full dump of all parameters with labels, by category |
 | `web_search` | Tavily API | Web search for mission news |
 | `mission_timeline` | Local ephemeris JSON | Computed milestones from trajectory vectors |
 | `calculate` | None (local eval) | Math with orbital mechanics constants |
 | `analyze_screenshot` | WebSocket round-trip | Captures Three.js canvas, sends to Claude vision |
 | `analyze_live_feed` | yt-dlp + ffmpeg | Captures frame from NASA YouTube live stream |
+| `dsn_status` | NASA DSN XML feed | Real-time Deep Space Network antenna status |
+| `tdrs_status` | CelesTrak TLE data | TDRS relay satellite constellation positions |
 
 ### `backend/main.py`
 

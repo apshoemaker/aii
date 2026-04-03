@@ -8,7 +8,7 @@ const REFRESH_MS = 30 * 60 * 1000; // 30 minutes
 
 // Mission window
 const START = '2026-04-02 02:00';
-const STOP = '2026-04-11 00:00';
+const STOP = '2026-04-10 23:50';
 const STEP = '10 min';
 
 /**

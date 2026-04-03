@@ -52,3 +52,26 @@ Positions in km, velocities in km/s, Earth-centered ICRF.
 | Orion | NASA 3D Resources GitHub (capsule STL) | 51,736 triangles |
 
 All NASA assets are public domain per NASA Media Usage Guidelines.
+
+## NASA Deep Space Network
+
+**XML Feed**: `https://eyes.nasa.gov/dsn/data/dsn.xml`
+**Visual**: `https://eyes.nasa.gov/dsn/dsn.html` (embedded as iframe)
+**CORS**: No (proxied via Vite at `/api/dsn`)
+**Update frequency**: ~5 seconds
+**Auth**: Public
+
+**XML structure**: `<station>` and `<dish>` are siblings under `<dsn>` (not nested).
+Artemis II appears as spacecraft name **"EM2"** with ID -24.
+
+**Data provided**: Active antennas, target spacecraft, azimuth/elevation, signal bands, data rates, range, round-trip light time.
+
+## TDRS Constellation
+
+**Source**: CelesTrak NORAD TLE data
+**URL**: `https://celestrak.org/NORAD/elements/gp.php?GROUP=tdrss&FORMAT=json`
+**CORS**: No (proxied via Vite at `/api/tdrs`)
+**Auth**: Public
+**Update frequency**: TLEs update every few hours
+
+**Note**: No public real-time link status is available for TDRS. Only orbital positions can be determined from TLE data. Active TDRS fleet: TDRS-3, 5, 6, 7, 8, 11, 12, 13.
