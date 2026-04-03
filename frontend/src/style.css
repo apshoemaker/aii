@@ -560,3 +560,119 @@ canvas#scene {
 .chat-input-row button:hover {
   background: rgba(79, 195, 247, 0.3);
 }
+
+/* ============================================
+   MOBILE RESPONSIVE (< 768px)
+   ============================================ */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: auto;
+  }
+
+  /* Scene — top portion, relative flow */
+  canvas#scene {
+    width: 100vw !important;
+    height: 40vh !important;
+    position: relative;
+  }
+
+  /* HUD — overlay on the scene */
+  #hud {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
+  }
+
+  #hud-title {
+    font-size: 13px;
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+  }
+
+  #hud > div {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  #hud .label {
+    width: 55px;
+    font-size: 9px;
+  }
+
+  #hud-status { margin-top: 4px; }
+
+  /* Timeline — hidden on mobile */
+  #timeline { display: none; }
+
+  /* Feeds — full width, in flow */
+  #live-feeds {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 100%;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid #333;
+  }
+
+  .feed-cell iframe { height: 90px; }
+
+  /* Sidebar — in flow below feeds, fills remaining space */
+  #sidebar {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    min-height: 50vh;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid #333;
+  }
+
+  .sidebar-tab {
+    font-size: 12px;
+    padding: 10px 0;
+  }
+
+  /* DSN embed shorter on mobile */
+  .dsn-embed { min-height: 200px; }
+  .dsn-embed iframe { min-height: 200px; }
+
+  /* DSN stations stack vertically */
+  .dsn-stations {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Refresh button — float on scene */
+  #refresh-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    bottom: auto;
+    left: auto;
+    z-index: 20;
+  }
+
+  /* Chat — safe area padding */
+  .chat-input-row {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  /* Chat messages take available space */
+  .chat-messages {
+    min-height: 200px;
+  }
+}
+
+/* Tablet tweaks (768-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #sidebar { width: 340px; }
+  #live-feeds { width: 440px; }
+  .feed-cell iframe { height: 130px; }
+}
