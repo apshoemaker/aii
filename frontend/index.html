@@ -14,12 +14,13 @@
     <button class="mobile-tab" data-mtab="dsn">DSN</button>
     <button class="mobile-tab" data-mtab="tdrs">TDRS</button>
     <button class="mobile-tab" data-mtab="chat">Chat</button>
+    <button class="mobile-tab" data-mtab="about">About</button>
   </div>
 
   <canvas id="scene"></canvas>
 
   <div id="hud">
-    <div id="hud-title">ARTEMIS II</div>
+    <div id="hud-title">ARTEMIS II <button id="about-btn" title="About this project">?</button></div>
     <div id="hud-met"><span class="label">MET</span> <span id="met-value">—</span></div>
     <div id="hud-earth"><span class="label">Earth</span> <span id="earth-dist">—</span></div>
     <div id="hud-alt"><span class="label">Altitude</span> <span id="earth-alt">—</span></div>
@@ -100,6 +101,27 @@
     </div>
   </div>
 
+  <!-- About panel (desktop: popout, mobile: tab) -->
+  <div id="about-panel">
+    <div class="about-content">
+      <h2>aii</h2>
+      <p>Real-time 3D Artemis II trajectory viewer with AI mission assistant.</p>
+      <p>Track NASA's Artemis II crewed lunar flyby mission as it happens — with live telemetry, JPL Horizons ephemeris data, Deep Space Network status, and an AI agent that can answer questions about the mission.</p>
+      <h3>Data Sources</h3>
+      <ul>
+        <li><strong>JPL Horizons</strong> — predicted trajectory vectors</li>
+        <li><strong>NASA GCS</strong> — live spacecraft telemetry</li>
+        <li><strong>NASA DSN</strong> — antenna tracking status</li>
+        <li><strong>CelesTrak</strong> — TDRS satellite positions</li>
+      </ul>
+      <h3>Built With</h3>
+      <p>Three.js, FastAPI, LangGraph, OpenRouter</p>
+      <h3>Links</h3>
+      <p><a href="https://github.com/apshoemaker/aii" target="_blank">GitHub Repository</a></p>
+      <p class="about-disclaimer">This project is not affiliated with, endorsed by, or connected to NASA, JPL, or any government agency. AI responses may be inaccurate.</p>
+    </div>
+  </div>
+
   <button id="refresh-btn" title="Refresh ephemeris from Horizons"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg></button>
 
   <script>
@@ -123,7 +145,12 @@
         if (sidebar) sidebar.style.display = 'none';
         if (refreshBtn) refreshBtn.style.display = 'none';
 
-        if (id === '3d') {
+        const aboutPanel = document.getElementById('about-panel');
+        if (aboutPanel) aboutPanel.style.display = 'none';
+
+        if (id === 'about') {
+          if (aboutPanel) aboutPanel.style.display = 'flex';
+        } else if (id === '3d') {
           if (sceneWrapper) sceneWrapper.style.display = 'block';
           if (hud) hud.style.display = 'block';
           if (refreshBtn) refreshBtn.style.display = 'flex';
@@ -137,6 +164,21 @@
           document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.toggle('active', p.dataset.tab === id));
         }
       });
+    });
+
+    // Desktop about button toggle
+    document.getElementById('about-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const panel = document.getElementById('about-panel');
+      panel.classList.toggle('visible');
+    });
+
+    // Close about panel when clicking outside
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('about-panel');
+      if (panel.classList.contains('visible') && !panel.contains(e.target) && e.target.id !== 'about-btn') {
+        panel.classList.remove('visible');
+      }
     });
 
     // Sidebar tab switching
