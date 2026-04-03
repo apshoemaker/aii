@@ -10,7 +10,7 @@ START → agent_node → tools_condition
                         └→ END (no tool calls)
 ```
 
-**Model**: Claude Sonnet 4 (`claude-sonnet-4-20250514`) with 4096 max tokens.
+**Model**: Claude Haiku 4.5 (`anthropic/claude-haiku-4.5`) via OpenRouter, with 4096 max tokens. Configurable via `OPENROUTER_MODEL` env var or `DEFAULT_MODEL` in `graph.py`.
 
 **Memory**: `MemorySaver` checkpointer, keyed by thread_id (client UUID). Conversations persist across messages within a session.
 
