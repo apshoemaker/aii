@@ -58,3 +58,4 @@ jobs:
             --cpu=1
             --min-instances=0
             --max-instances=3
+            --set-secrets=OPENROUTER_API_KEY=openrouter-key:latest,TAVILY_API_KEY=tavily-key:latest

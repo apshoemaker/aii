@@ -108,6 +108,8 @@ def build_graph(extra_tools=None):
     load_dotenv()
 
     api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        raise ValueError("OPENROUTER_API_KEY not set. Chat assistant is unavailable.")
     model_name = os.getenv("OPENROUTER_MODEL", DEFAULT_MODEL)
 
     model = ChatOpenAI(
