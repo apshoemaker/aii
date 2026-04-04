@@ -11,6 +11,7 @@ import { updateHUD } from './hud/hud.js';
 import { renderTimeline, setMilestones } from './hud/timeline.js';
 
 import { initLabelRenderer } from './utils/labels.js';
+import { createMoonView } from './moon-camera/moon-view.js';
 import { createChatPanel } from './chat/chat-ui.js';
 import { createChatConnection } from './chat/chat-ws.js';
 import missionClock from './utils/mission-clock.js';
@@ -31,6 +32,8 @@ scene.add(moon.mesh);
 
 const sun = createSun(sunLight);
 scene.add(sun.group);
+
+const moonView = createMoonView(document.getElementById('moon-canvas'), moon.mesh);
 
 // Ephemeris — auto-refreshes from Horizons every 30 min
 let moonInterp = null;
@@ -142,6 +145,14 @@ function animate() {
     craftPos = artemisInterp.stateAt(now);
     if (craftPos) {
       spacecraft.updateFromEphemeris(craftPos);
+    }
+  }
+
+  // Update moon illumination view from Orion's perspective
+  if (craftPos && moonIcrf && sunInterp) {
+    const sunPos = sunInterp.positionAt(now);
+    if (sunPos) {
+      moonView.update(craftPos, moonIcrf, sunPos);
     }
   }
 

@@ -83,7 +83,7 @@ canvas#scene {
 /* Telemetry panel — collapsible below HUD */
 #telemetry-panel {
   position: fixed;
-  top: 210px;
+  top: 370px;
   left: 20px;
   width: 220px;
   z-index: 10;
@@ -148,6 +148,69 @@ canvas#scene {
 
 .tp-label { color: #888; }
 .tp-value { color: #ccc; text-align: right; }
+
+/* Moon illumination view — left panel below telemetry */
+#moon-view {
+  position: fixed;
+  top: 210px;
+  left: 20px;
+  z-index: 10;
+  width: 220px;
+  font-family: 'Courier New', monospace;
+}
+
+.moon-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 10px;
+  background: rgba(18, 18, 22, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid #333;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+}
+
+.moon-view-title {
+  color: #aaa;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+#moon-view-toggle {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s;
+}
+
+#moon-view.collapsed #moon-view-toggle {
+  transform: rotate(-90deg);
+}
+
+.moon-view-embed {
+  border: 1px solid #333;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;
+  background: #000;
+  transition: height 0.3s;
+}
+
+#moon-canvas {
+  width: 220px;
+  height: 124px;
+  display: block;
+}
+
+#moon-view.collapsed .moon-view-embed {
+  height: 0;
+  border: none;
+}
 
 /* Refresh button */
 #refresh-btn {
