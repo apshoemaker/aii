@@ -9,7 +9,7 @@ import { createTelemetryPoller } from './spacecraft/telemetry-poller.js';
 import { createSpacecraftMarker } from './spacecraft/spacecraft-marker.js';
 import { updateHUD } from './hud/hud.js';
 import { renderTimeline, setMilestones } from './hud/timeline.js';
-import { icrfToThree } from './utils/coordinates.js';
+
 import { initLabelRenderer } from './utils/labels.js';
 import { createChatPanel } from './chat/chat-ui.js';
 import { createChatConnection } from './chat/chat-ws.js';
@@ -105,13 +105,12 @@ function animate() {
   // Rotate Earth
   earth.update(now);
 
-  // Position Moon from ephemeris
+  // Position and orient Moon from ephemeris (tidally locked)
   let moonIcrf = null;
   if (moonInterp) {
-    moonIcrf = moonInterp.positionAt(now);
+    moonIcrf = moonInterp.stateAt(now);
     if (moonIcrf) {
-      const p = icrfToThree(moonIcrf.x, moonIcrf.y, moonIcrf.z);
-      moon.mesh.position.copy(p);
+      moon.update(moonIcrf);
     }
   }
 
