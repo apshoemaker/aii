@@ -2,6 +2,7 @@ import { createScene } from './scene.js';
 import { createEarth } from './bodies/earth.js';
 import { createMoon } from './bodies/moon.js';
 import { createSun } from './bodies/sun.js';
+import { createSOIVisuals } from './bodies/soi.js';
 import { createInterpolator } from './trajectory/interpolator.js';
 import { createTrajectoryLine } from './trajectory/trajectory-line.js';
 import { createEphemerisSource } from './trajectory/ephemeris-fetcher.js';
@@ -34,6 +35,19 @@ const sun = createSun(sunLight);
 scene.add(sun.group);
 
 const moonView = createMoonView(document.getElementById('moon-canvas'), moon.mesh);
+
+// Sphere of Influence visuals
+const soi = createSOIVisuals();
+scene.add(soi.group);
+
+// SOI toggle button
+const soiBtn = document.getElementById('soi-toggle');
+if (soiBtn) {
+  soiBtn.addEventListener('click', () => {
+    const on = soi.toggle();
+    soiBtn.classList.toggle('active', on);
+  });
+}
 
 // Ephemeris — auto-refreshes from Horizons every 30 min
 let moonInterp = null;
@@ -114,6 +128,7 @@ function animate() {
     moonIcrf = moonInterp.stateAt(now);
     if (moonIcrf) {
       moon.update(moonIcrf);
+      soi.updateMoonSOI(moon.mesh, moonIcrf);
     }
   }
 

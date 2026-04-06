@@ -37,6 +37,17 @@ export const PARAM = {
   MET: '5001',
 };
 
+// Gravitational Sphere of Influence radii (km)
+// Formula: r_SOI = a × (m/M)^(2/5)
+// Earth SOI (vs Sun): a = 149,597,870.7 km, m/M = 3.003e-6
+export const EARTH_SOI_KM = 929_000;
+// Moon SOI (vs Earth): a = 384,400 km, m/M = 0.01230
+export const MOON_SOI_KM = 66_100;
+
+// Scaled SOI radii (Three.js units)
+export const EARTH_SOI = EARTH_SOI_KM * SCALE;
+export const MOON_SOI = MOON_SOI_KM * SCALE;
+
 // Colors
 export const TRAJECTORY_COLOR = 0x4fc3f7;
 export const SPACECRAFT_COLOR = 0xffeb3b;
